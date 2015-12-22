@@ -2,6 +2,7 @@ from setuptools import setup
 
 setup(
     name='lektor-s3',
+    description='Lektor plugin to support publishing to S3',
     version='0.1.1',
     author=u'Spencer Nelson',
     author_email='s@spenczar.com',
