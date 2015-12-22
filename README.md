@@ -8,7 +8,7 @@ Install with the usual Lektor toolchain. Within your project, run
 ```
 lektor plugins add lektor-s3
 ```
-You should see a message saying lektor has been added to the project.
+You should see a message saying lektor-s3 has been added to the project.
 
 Next, add an S3 bucket to your project's servers. In your project file
 (like `blog.lektorproject`), add the following:
