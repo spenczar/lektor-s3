@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='lektor-s3',
-    version='0.1',
+    version='0.1.1',
     author=u'Spencer Nelson',
     author_email='s@spenczar.com',
     url='https://github.com/spenczar/lektor-s3',
