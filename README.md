@@ -38,8 +38,12 @@ for how to set up a bucket to host a static website.
 ## Credentials ##
 
 You need to prove to S3 that you have permission to upload to the
-bucket you've chosen. lektor-s3 uses boto, which means it will obey
-[boto's usual flow for gathering credentials](http://boto3.readthedocs.org/en/latest/guide/configuration.html). For a refresher, that means you have two options: you can store your
+bucket you've chosen.
+
+lektor-s3 uses boto, which means it will obey
+[boto's usual flow for gathering credentials](http://boto3.readthedocs.org/en/latest/guide/configuration.html).
+
+For a refresher, that means you have two options: you can store your
 credentials in an INI file at `~/.aws/credentials`, or you can pass
 credentials in through the environment variables `AWS_ACCESS_KEY_ID`
 and `AWS_SECRET_ACCESS_KEY`.
