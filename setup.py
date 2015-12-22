@@ -5,6 +5,7 @@ setup(
     version='0.1',
     author=u'Spencer Nelson',
     author_email='s@spenczar.com',
+    url='https://github.com/spenczar/lektor-s3',
     license='MIT',
     py_modules=['lektor_s3'],
     entry_points={
