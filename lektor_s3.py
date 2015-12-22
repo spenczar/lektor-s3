@@ -3,18 +3,26 @@ import mimetypes
 import os
 from hashlib import md5
 
-from lektor.publisher import Publisher, publishers
+from lektor.publisher import Publisher
 from lektor.pluginsystem import Plugin
 
 import boto3
 import botocore.exceptions
+
 
 class S3Plugin(Plugin):
     name = u's3'
     description = u'Adds S3 as a deploy target. Use s3://<bucket> to deploy to a bucket.'
 
     def on_setup_env(self, **extra):
-        publishers['s3'] = S3Publisher
+        # Modern Lektor stores publishers in env
+        if hasattr(self.env, 'publishers'):
+            self.env.publishers['s3'] = S3Publisher
+        # Older versions stored publishers in a global
+        else:
+            from lektor.publisher import publishers
+            publishers['s3'] = S3Publisher
+
 
 class S3Publisher(Publisher):
     def __init__(self, env, output_path):
