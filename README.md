@@ -47,3 +47,8 @@ For a refresher, that means you have two options: you can store your
 credentials in an INI file at `~/.aws/credentials`, or you can pass
 credentials in through the environment variables `AWS_ACCESS_KEY_ID`
 and `AWS_SECRET_ACCESS_KEY`.
+
+## Contributing ##
+
+Pull requests are super useful and encouraged! Once accepted, changes
+are published using lektor with `lektor dev publish-plugin`.
