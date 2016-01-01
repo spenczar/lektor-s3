@@ -3,7 +3,7 @@ import mimetypes
 import os
 from hashlib import md5
 
-from lektor.publisher import Publisher
+from lektor.publisher import Publisher, PublishError
 from lektor.pluginsystem import Plugin
 
 import boto3
