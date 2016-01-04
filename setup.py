@@ -8,6 +8,7 @@ setup(
     author_email='s@spenczar.com',
     url='https://github.com/spenczar/lektor-s3',
     license='MIT',
+    platforms='any',
     py_modules=['lektor_s3'],
     entry_points={
         'lektor.plugins': [
@@ -17,5 +18,15 @@ setup(
     install_requires=[
         'Lektor',
         'boto3>=1.1.4',
+    ],
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Environment :: Web Environment',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 2.7',
+        'Topic :: Internet :: WWW/HTTP :: Site Management',
+        'Topic :: Software Development :: Libraries :: Python Modules'
     ]
 )
