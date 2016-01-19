@@ -50,6 +50,26 @@ credentials in an INI file at `~/.aws/credentials`, or you can pass
 credentials in through the environment variables `AWS_ACCESS_KEY_ID`
 and `AWS_SECRET_ACCESS_KEY`.
 
+If you have multiple sets of credentials, you can group them into profiles in
+your credentials file and choose the right one using the `AWS_PROFILE`
+environment variable. Your `~/.aws/credenials` file might look like this:
+
+```ini
+[work]
+aws_access_key_id = <...>
+aws_secret_access_key = <...>
+
+[personal]
+aws_access_key_id = <...>
+aws_secret_access_key = <...>
+```
+
+And then you can invoke `lektor` with the environment variable:
+
+```console
+$ AWS_PROFILE=personal lektor deploy`
+```
+
 ## Contributing ##
 
 Pull requests are super useful and encouraged! Once accepted, changes
