@@ -5,15 +5,17 @@ lektor-s3 makes it easy to deploy your
 
 ## Installation and Usage ##
 Install with the usual Lektor toolchain. Within your project, run
-```
+
+```console
 lektor plugins add lektor-s3
 ```
+
 You should see a message saying lektor-s3 has been added to the project.
 
 Next, add an S3 bucket to your project's servers. In your project file
 (like `blog.lektorproject`), add the following:
 
-```
+```ini
 [servers.s3]
 name = S3
 enabled = yes
@@ -23,7 +25,7 @@ target = s3://<YOUR-BUCKET>
 For example, if you wanted to deploy to a bucket named 'huntedwumpus',
 you'd make that last line
 
-```
+```ini
 target = s3://huntedwumpus
 ```
 
