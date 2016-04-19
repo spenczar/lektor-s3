@@ -3,6 +3,18 @@
 lektor-s3 makes it easy to deploy your
 [Lektor](https://github.com/lektor/lektor) project to an S3 bucket.
 
+## Before you start ##
+
+You're going to be storing your website's data in an S3 bucket. The code
+here won't do anything to create or configure that bucket. You'll have to 
+create the S3 bucket and set it up yourself. 
+
+AWS has a [pretty good guide](http://docs.aws.amazon.com/gettingstarted/latest/swh/website-hosting-intro.html)
+for how to set up a bucket to host a static website. You'll need to both 
+create the bucket and set its permissions to allow global read access.
+Remember to do this **first** because lektor-s3 won't do it automatically.
+
+
 ## Installation and Usage ##
 Install with the usual Lektor toolchain. Within your project, run
 
@@ -31,11 +43,6 @@ target = s3://huntedwumpus
 
 Now, if you call `lektor deploy s3`, Lektor will upload your built
 website to S3 in the bucket you targeted.
-
-**Important:** the bucket must already exist. lektor-s3 won't
-automatically create the S3 bucket for you. AWS has a
-[pretty good guide](http://docs.aws.amazon.com/gettingstarted/latest/swh/website-hosting-intro.html)
-for how to set up a bucket to host a static website.
 
 ## Credentials ##
 
