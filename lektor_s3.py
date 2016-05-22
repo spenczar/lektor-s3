@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import mimetypes
 import os
+import time
 from hashlib import md5
 
 from lektor.publisher import Publisher, PublishError
@@ -30,6 +31,7 @@ class S3Publisher(Publisher):
         self.s3 = None
         self.bucket = None
         self.key_prefix = ''
+        self.cloudfront = None
 
     def split_bucket_uri(self, target_url):
         bucket = target_url.netloc
@@ -159,8 +161,9 @@ class S3Publisher(Publisher):
 
     def connect(self, credentials):
         self.s3 = boto3.resource(service_name='s3')
+        self.cloudfront = boto3.client(service_name='cloudfront')
 
-    def publish(self, target_url, credentials=None, **extra):
+    def publish(self, target_url, credentials=None, server_info=None, **extra):
         if credentials is None:
             credentials = {}
         self.connect(credentials)
@@ -189,4 +192,23 @@ class S3Publisher(Publisher):
             yield 'deleting %s' % f
         self.delete_batch(diff['delete'])
 
-
+        # should we invalidate cloudfront?
+        # only invalidate added and updated files; leave deleted as they are
+        changed = diff['add'] + diff['update']
+        if server_info and changed:
+            distribution_id = server_info.extra.get("cloudfront")
+        else:
+            distribution_id = None
+        if distribution_id:
+            ref = "lektor{time}".format(time=time.time())
+            self.cloudfront.create_invalidation(
+                DistributionId=distribution_id,
+                InvalidationBatch={
+                    'Paths': {
+                        'Quantity': len(changed),
+                        'Items': ['/{}'.format(file) for file in changed],
+                    },
+                    'CallerReference': ref,
+                }
+            )
+            yield 'invalidated {num} paths in CloudFront'.format(num=len(changed))
