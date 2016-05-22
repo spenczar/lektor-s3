@@ -159,6 +159,23 @@ class S3Publisher(Publisher):
             Delete={'Objects': [{'Key': self.key_prefix + f} for f in filenames]}
         )
 
+    def invalidate_cloudfront(self, distribution_id, changed):
+        if not distribution_id or not changed:
+            return
+
+        ref = "lektor{time}".format(time=time.time())
+        self.cloudfront.create_invalidation(
+            DistributionId=distribution_id,
+            InvalidationBatch={
+                'Paths': {
+                    'Quantity': len(changed),
+                    'Items': ['/{}'.format(file) for file in changed],
+                },
+                'CallerReference': ref,
+            }
+        )
+        yield 'invalidated {num} paths in CloudFront'.format(num=len(changed))
+
     def connect(self, credentials):
         self.s3 = boto3.resource(service_name='s3')
         self.cloudfront = boto3.client(service_name='cloudfront')
@@ -192,23 +209,14 @@ class S3Publisher(Publisher):
             yield 'deleting %s' % f
         self.delete_batch(diff['delete'])
 
-        # should we invalidate cloudfront?
-        # only invalidate added and updated files; leave deleted as they are
+        # CloudFront CDN
+        # Only invalidate added and updated files; leave deleted as they are
+        # (because invalidation costs money)
         changed = diff['add'] + diff['update']
         if server_info and changed:
             distribution_id = server_info.extra.get("cloudfront")
         else:
             distribution_id = None
-        if distribution_id:
-            ref = "lektor{time}".format(time=time.time())
-            self.cloudfront.create_invalidation(
-                DistributionId=distribution_id,
-                InvalidationBatch={
-                    'Paths': {
-                        'Quantity': len(changed),
-                        'Items': ['/{}'.format(file) for file in changed],
-                    },
-                    'CallerReference': ref,
-                }
-            )
-            yield 'invalidated {num} paths in CloudFront'.format(num=len(changed))
+
+        for message in self.invalidate_cloudfront(distribution_id, changed):
+            yield message
