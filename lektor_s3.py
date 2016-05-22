@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import mimetypes
 import os
+import time
 from hashlib import md5
 
 from lektor.publisher import Publisher, PublishError
@@ -30,6 +31,7 @@ class S3Publisher(Publisher):
         self.s3 = None
         self.bucket = None
         self.key_prefix = ''
+        self.cloudfront = None
 
     def split_bucket_uri(self, target_url):
         bucket = target_url.netloc
@@ -157,10 +159,29 @@ class S3Publisher(Publisher):
             Delete={'Objects': [{'Key': self.key_prefix + f} for f in filenames]}
         )
 
+    def invalidate_cloudfront(self, distribution_id):
+        if not distribution_id:
+            return
+
+        ref = "lektor{time}".format(time=time.time())
+        path = "/{prefix}*".format(prefix=self.key_prefix)
+        self.cloudfront.create_invalidation(
+            DistributionId=distribution_id,
+            InvalidationBatch={
+                'Paths': {
+                    'Quantity': 1,
+                    'Items': [path],
+                },
+                'CallerReference': ref,
+            }
+        )
+        yield 'invalidated all paths in CloudFront'
+
     def connect(self, credentials):
         self.s3 = boto3.resource(service_name='s3')
+        self.cloudfront = boto3.client(service_name='cloudfront')
 
-    def publish(self, target_url, credentials=None, **extra):
+    def publish(self, target_url, credentials=None, server_info=None, **extra):
         if credentials is None:
             credentials = {}
         self.connect(credentials)
@@ -189,4 +210,10 @@ class S3Publisher(Publisher):
             yield 'deleting %s' % f
         self.delete_batch(diff['delete'])
 
+        if server_info:
+            distribution_id = server_info.extra.get("cloudfront")
+        else:
+            distribution_id = None
 
+        for message in self.invalidate_cloudfront(distribution_id):
+            yield message

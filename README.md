@@ -6,11 +6,11 @@ lektor-s3 makes it easy to deploy your
 ## Before you start ##
 
 You're going to be storing your website's data in an S3 bucket. The code
-here won't do anything to create or configure that bucket. You'll have to 
-create the S3 bucket and set it up yourself. 
+here won't do anything to create or configure that bucket. You'll have to
+create the S3 bucket and set it up yourself.
 
 AWS has a [pretty good guide](http://docs.aws.amazon.com/gettingstarted/latest/swh/website-hosting-intro.html)
-for how to set up a bucket to host a static website. You'll need to both 
+for how to set up a bucket to host a static website. You'll need to both
 create the bucket and set its permissions to allow global read access.
 Remember to do this **first** because lektor-s3 won't do it automatically.
 
@@ -43,6 +43,16 @@ target = s3://huntedwumpus
 
 Now, if you call `lektor deploy s3`, Lektor will upload your built
 website to S3 in the bucket you targeted.
+
+## CloudFront ##
+
+Optionally, you can also provide a [CloudFront](https://aws.amazon.com/cloudfront/)
+distribution ID. If you do, Lektor will invalidate all objects in that CloudFront
+distribution after every deploy.
+
+```ini
+cloudfront = <YOUR-DISTRIBUTION-ID>
+```
 
 ## Credentials ##
 
