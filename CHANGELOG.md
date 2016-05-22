@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.3.0] - 2016-05-22
+- Automatically invalidate CloudWatch cache if the user provides
+  CloudFront distribution ID.
+
 ## [0.2.3] - 2016-01-26
 - Fix to support Lektor when it passes new keyword arguments through the
   deploy command. This fixes #3 and resolves any future API-breaking changes.
