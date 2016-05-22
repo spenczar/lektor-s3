@@ -159,22 +159,23 @@ class S3Publisher(Publisher):
             Delete={'Objects': [{'Key': self.key_prefix + f} for f in filenames]}
         )
 
-    def invalidate_cloudfront(self, distribution_id, changed):
-        if not distribution_id or not changed:
+    def invalidate_cloudfront(self, distribution_id):
+        if not distribution_id:
             return
 
         ref = "lektor{time}".format(time=time.time())
+        path = "/{prefix}*".format(prefix=self.key_prefix)
         self.cloudfront.create_invalidation(
             DistributionId=distribution_id,
             InvalidationBatch={
                 'Paths': {
-                    'Quantity': len(changed),
-                    'Items': ['/{}'.format(file) for file in changed],
+                    'Quantity': 1,
+                    'Items': [path],
                 },
                 'CallerReference': ref,
             }
         )
-        yield 'invalidated {num} paths in CloudFront'.format(num=len(changed))
+        yield 'invalidated all paths in CloudFront'
 
     def connect(self, credentials):
         self.s3 = boto3.resource(service_name='s3')
@@ -209,14 +210,10 @@ class S3Publisher(Publisher):
             yield 'deleting %s' % f
         self.delete_batch(diff['delete'])
 
-        # CloudFront CDN
-        # Only invalidate added and updated files; leave deleted as they are
-        # (because invalidation costs money)
-        changed = diff['add'] + diff['update']
-        if server_info and changed:
+        if server_info:
             distribution_id = server_info.extra.get("cloudfront")
         else:
             distribution_id = None
 
-        for message in self.invalidate_cloudfront(distribution_id, changed):
+        for message in self.invalidate_cloudfront(distribution_id):
             yield message

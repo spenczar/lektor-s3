@@ -47,8 +47,8 @@ website to S3 in the bucket you targeted.
 ## CloudFront ##
 
 Optionally, you can also provide a [CloudFront](https://aws.amazon.com/cloudfront/)
-distribution ID. If you do, Lektor will invalidate all objects in CloudFront that
-have just been deployed on S3.
+distribution ID. If you do, Lektor will invalidate all objects in that CloudFront
+distribution after every deploy.
 
 ```ini
 cloudfront = <YOUR-DISTRIBUTION-ID>
