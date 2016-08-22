@@ -128,15 +128,17 @@ class S3Publisher(Publisher):
             'delete': [],
         }
         remote_keys = {o.key: o for o in remote}
+        local_keys = []
         for f in local:
-            key = self.key_prefix + f
+            key = posixify(self.key_prefix + f)
             if key in remote_keys:
                 if self.different(f, remote_keys[key]):
                     diff['update'].append(f)
             else:
                 diff['add'].append(f)
+            local_keys.append(key)
         for k in remote_keys:
-            if k not in local:
+            if k not in local_keys:
                 diff['delete'].append(k)
         return diff
 
@@ -147,7 +149,7 @@ class S3Publisher(Publisher):
         mime, _ = mimetypes.guess_type(filename)
         if mime is None:
             mime = "text/plain"
-        self.bucket.upload_file(abs_filename, key, ExtraArgs={'ContentType': mime})
+        self.bucket.upload_file(abs_filename, posixify(key), ExtraArgs={'ContentType': mime})
 
     def update(self, filename):
         # Updates are just overwrites in S3

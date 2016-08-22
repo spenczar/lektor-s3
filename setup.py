@@ -16,7 +16,10 @@ setup(
         ]
     },
     test_suite='nose.collector',
-    tests_require=['nose'],
+    tests_require=[
+        'nose',
+        'boto3>=1.1.4',
+    ],
     install_requires=[
         'Lektor',
         'boto3>=1.1.4',
