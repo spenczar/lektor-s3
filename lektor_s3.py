@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import mimetypes
 import os
+import posixpath
 import time
 from hashlib import md5
 
@@ -127,15 +128,17 @@ class S3Publisher(Publisher):
             'delete': [],
         }
         remote_keys = {o.key: o for o in remote}
+        local_keys = []
         for f in local:
-            key = self.key_prefix + f
+            key = posixify(self.key_prefix + f)
             if key in remote_keys:
                 if self.different(f, remote_keys[key]):
                     diff['update'].append(f)
             else:
                 diff['add'].append(f)
+            local_keys.append(key)
         for k in remote_keys:
-            if k not in local:
+            if k not in local_keys:
                 diff['delete'].append(k)
         return diff
 
@@ -146,7 +149,7 @@ class S3Publisher(Publisher):
         mime, _ = mimetypes.guess_type(filename)
         if mime is None:
             mime = "text/plain"
-        self.bucket.upload_file(abs_filename, key, ExtraArgs={'ContentType': mime})
+        self.bucket.upload_file(abs_filename, posixify(key), ExtraArgs={'ContentType': mime})
 
     def update(self, filename):
         # Updates are just overwrites in S3
@@ -217,3 +220,22 @@ class S3Publisher(Publisher):
 
         for message in self.invalidate_cloudfront(distribution_id):
             yield message
+
+
+def posixify(path):
+    """ Ensure that a filepath is slash-delimited, posix-style. """
+    return posixpath.join(*split_path(path))
+
+
+def split_path(path):
+    """ Split a path into its components according to the local OS's rules. """
+    parts = []
+    split = os.path.split(path)
+    last_split = ""
+    while split[0] != last_split:
+        parts.insert(0, split[1])
+        last_split = split[0]
+        split = os.path.split(split[0])
+    if len(split[0]) > 0:
+        parts.insert(0, split[0])
+    return parts

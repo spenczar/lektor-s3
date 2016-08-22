@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.3.1] - 2016-08-22
+- Fix to allow uploading from a Windows environment correctly. Before
+  this revision, the local filepaths were assumed to be POSIX
+  paths. See https://github.com/spenczar/lektor-s3/issues/10.
+
 ## [0.3.0] - 2016-05-22
 - Automatically invalidate CloudWatch cache if the user provides
   CloudFront distribution ID.

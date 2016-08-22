@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='lektor-s3',
     description='Lektor plugin to support publishing to S3',
-    version='0.3.0',
+    version='0.3.1',
     author=u'Spencer Nelson',
     author_email='s@spenczar.com',
     url='https://github.com/spenczar/lektor-s3',
@@ -15,6 +15,11 @@ setup(
             's3 = lektor_s3:S3Plugin',
         ]
     },
+    test_suite='nose.collector',
+    tests_require=[
+        'nose',
+        'boto3>=1.1.4',
+    ],
     install_requires=[
         'Lektor',
         'boto3>=1.1.4',
