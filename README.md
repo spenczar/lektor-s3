@@ -87,6 +87,49 @@ And then you can invoke `lektor` with the environment variable:
 $ AWS_PROFILE=personal lektor deploy`
 ```
 
+## Configuration ##
+
+You can specify headers to be attached to particular files when uploading them
+to S3. These can be configured in an INI file at `configs/s3.ini` under your
+project root.
+
+You can name the sections anything that makes sense to you, but every section
+must have either a `match` or an `extensions` item to specify which files the
+configuration applies to. If using `match`, you should write this as a regular
+expression that will be applied against the filename using the regular
+expression's search method. If using `extensions`, write a comma-separated list
+of the file extensions to which the configuration applies. Both `match` and
+`extensions` may be specified.
+
+The rest of the items in each section should specify one or more headers and
+their values. A list of valid headers is defined in the boto documentation as
+ [`ALLOWED_UPLOAD_ARGS`](https://boto3.readthedocs.io/en/latest/reference/customizations/s3.html#boto3.s3.transfer.S3Transfer.ALLOWED_UPLOAD_ARGS).
+
+Defaults can be defined via the usual INI file way, in a `[DEFAULTS]` section.
+
+For example, your configuration file might look like this:
+
+```ini
+[DEFAULT]
+CacheControl = public,max-age=3600
+
+[static files]
+match = .(css|js|woff|woff2)$
+CacheControl = public,max-age=31536000
+
+[media]
+extensions = jpg,jpeg,png,mp4
+CacheControl = public,max-age=259200
+
+[fonts]
+extensions = woff2
+ContentType = application/font-woff2
+
+[documents]
+extensions = html,txt
+ContentLanguage = en
+```
+
 ## Contributing ##
 
 Pull requests are super useful and encouraged! Once accepted, changes
