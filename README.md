@@ -91,3 +91,5 @@ $ AWS_PROFILE=personal lektor deploy`
 
 Pull requests are super useful and encouraged! Once accepted, changes
 are published using lektor with `lektor dev publish-plugin`.
+
+Run your tests by invoking `python setup.py test`.

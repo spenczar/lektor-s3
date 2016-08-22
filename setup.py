@@ -15,6 +15,8 @@ setup(
             's3 = lektor_s3:S3Plugin',
         ]
     },
+    test_suite='nose.collector',
+    tests_require=['nose'],
     install_requires=[
         'Lektor',
         'boto3>=1.1.4',

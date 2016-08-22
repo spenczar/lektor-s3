@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import mimetypes
 import os
+import posixpath
 import time
 from hashlib import md5
 
@@ -217,3 +218,22 @@ class S3Publisher(Publisher):
 
         for message in self.invalidate_cloudfront(distribution_id):
             yield message
+
+
+def posixify(path):
+    """ Ensure that a filepath is slash-delimited, posix-style. """
+    return posixpath.join(*split_path(path))
+
+
+def split_path(path):
+    """ Split a path into its components according to the local OS's rules. """
+    parts = []
+    split = os.path.split(path)
+    last_split = ""
+    while split[0] != last_split:
+        parts.insert(0, split[1])
+        last_split = split[0]
+        split = os.path.split(split[0])
+    if len(split[0]) > 0:
+        parts.insert(0, split[0])
+    return parts
