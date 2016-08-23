@@ -18,6 +18,10 @@ class TestPosixPaths(TestCase):
         have = lektor_s3.split_path(p)
         self.assertEqual(have, ['/', 'some', 'posixy', 'path'])
 
+    def test_split_empty_path(self):
+        p = ""
+        have = lektor_s3.split_path(p)
+        self.assertEqual(have, [''])
 
     def test_split_abspath_trailing_slash(self):
         p = "/some/posixy/path/"
