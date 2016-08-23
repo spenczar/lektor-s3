@@ -19,11 +19,16 @@ class TestComputeWindowsDiff(TestCase):
         self.old_different = lektor_s3.S3Publisher.different
         def monkeypatched_different(self, *args, **kwargs):
             return False
+        self.old_get_config = lektor_s3.S3Publisher.get_config
+        def monkeypatched_get_config(self, *args, **kwargs):
+            return None
         lektor_s3.S3Publisher.different = monkeypatched_different
+        lektor_s3.S3Publisher.get_config = monkeypatched_get_config
 
     def tearDown(self):
         os.path = self.old_path
         lektor_s3.S3Publisher.different = self.old_different
+        lektor_s3.S3Publisher.get_config = self.old_get_config
 
     def test_compute_diff(self):
         publisher = lektor_s3.S3Publisher("", "")
@@ -58,11 +63,16 @@ class TestComputePosixDiff(TestCase):
         self.old_different = lektor_s3.S3Publisher.different
         def monkeypatched_different(self, *args, **kwargs):
             return False
+        self.old_get_config = lektor_s3.S3Publisher.get_config
+        def monkeypatched_get_config(self, *args, **kwargs):
+            return None
         lektor_s3.S3Publisher.different = monkeypatched_different
+        lektor_s3.S3Publisher.get_config = monkeypatched_get_config
 
     def tearDown(self):
         os.path = self.old_path
         lektor_s3.S3Publisher.different = self.old_different
+        lektor_s3.S3Publisher.get_config = self.old_get_config
 
     def test_compute_diff(self):
         publisher = lektor_s3.S3Publisher("", "")
