@@ -1,6 +1,7 @@
 *.pyc
 venv
 
+*.egg
 *.egg-info
 .eggs
 build
