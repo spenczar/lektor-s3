@@ -231,7 +231,7 @@ def split_path(path):
     """ Split a path into its components according to the local OS's rules. """
     parts = []
     split = os.path.split(path)
-    last_split = ""
+    last_split = None
     while split[0] != last_split:
         parts.insert(0, split[1])
         last_split = split[0]
