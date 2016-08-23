@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.3.2] - 2016-08-23
+- Fix bug in the posixification code which crashed on empty paths
+
 ## [0.3.1] - 2016-08-22
 - Fix to allow uploading from a Windows environment correctly. Before
   this revision, the local filepaths were assumed to be POSIX
