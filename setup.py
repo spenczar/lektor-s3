@@ -4,7 +4,7 @@ setup(
     name='lektor-s3',
     description='Lektor plugin to support publishing to S3',
     version='0.4.0',
-    author=u'Spencer Nelson',
+    author='Spencer Nelson',
     author_email='s@spenczar.com',
     url='https://github.com/spenczar/lektor-s3',
     license='MIT',
