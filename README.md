@@ -114,7 +114,7 @@ For example, your configuration file might look like this:
 CacheControl = public,max-age=3600
 
 [static files]
-match = .(css|js|woff|woff2)$
+match = \.(css|js|woff|woff2)$
 CacheControl = public,max-age=31536000
 
 [media]

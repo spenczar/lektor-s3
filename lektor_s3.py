@@ -181,7 +181,7 @@ class S3Publisher(Publisher):
                     section_applies = True
 
             if not section_applies and 'extensions' in options:
-                ext = filename.split('.')[-1]
+                ext = os.path.splitext(filename)[1][1:]
                 extensions = self.config.get(section, 'extensions')
                 if ext in extensions.split(','):
                     section_applies = True
@@ -283,7 +283,7 @@ def split_path(path):
     """ Split a path into its components according to the local OS's rules. """
     parts = []
     split = os.path.split(path)
-    last_split = ""
+    last_split = None
     while split[0] != last_split:
         parts.insert(0, split[1])
         last_split = split[0]
