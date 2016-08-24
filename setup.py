@@ -25,6 +25,7 @@ setup(
         'Lektor',
         'boto3>=1.1.4',
         's3transfer',
+        'inifile',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

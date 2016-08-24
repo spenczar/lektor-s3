@@ -1,24 +1,57 @@
-import ConfigParser
-
+from contextlib import contextmanager
+import os
+import shutil
+import tempfile
 from unittest import TestCase
 
+import inifile
+from lektor.environment import Environment
 import lektor_s3
+
+
+class MockEnvironment(object):
+    def __init__(self, root_path):
+        self.root_path = root_path
+
+@contextmanager
+def TemporaryDirectory():
+    name = tempfile.mkdtemp()
+    try:
+        yield name
+    finally:
+        shutil.rmtree(name)
+
+
+class TestLoadConfig(TestCase):
+    def test_no_config_file(self):
+        publisher = lektor_s3.S3Publisher(MockEnvironment(""), "")
+        self.assertEqual(len(publisher.get_config().sections()), 0)
+
+    def test_load_config_file(self):
+        with TemporaryDirectory() as tempdir:
+            os.mkdir(os.path.join(tempdir, "configs"))
+            config = inifile.IniFile(os.path.join(tempdir, "configs", "s3.ini"))
+            config["section.key"] = "value"
+            config.save()
+
+            publisher = lektor_s3.S3Publisher(MockEnvironment(tempdir), "")
+            have = publisher.get_config().section_as_dict("section")
+            self.assertEqual(have["key"], "value")
 
 
 class TestConfigureHeaders(TestCase):
     def setUp(self):
         self.old_get_config = lektor_s3.S3Publisher.get_config
         def monkeypatched_get_config(self, *args, **kwargs):
-            config = ConfigParser.RawConfigParser(defaults={'CacheControl': 'public,max-age=3600'})
-            config.add_section('fonts')
-            config.set('fonts', 'ContentType', 'application/font-woff2')
-            config.set('fonts', 'extensions', 'woff2')
-            config.add_section('media')
-            config.set('media', 'CacheControl', 'public,max-age=259200')
-            config.set('media', 'extensions', 'jpg,jpeg,png,mp4')
-            config.add_section('static files')
-            config.set('static files', 'CacheControl', 'public,max-age=31536000')
-            config.set('static files', 'match', '.(css|js|woff|woff2)$')
+            config = inifile.IniData(mapping={
+                "DEFAULTS.CacheControl": "public,max-age=3600",
+                "fonts.ContentType": "application/font-woff2",
+                "fonts.extensions": "woff2",
+                "media.CacheControl": "public,max-age=259200",
+                "media.extensions": "jpg,jpeg,png,mp4",
+                "static files.CacheControl": "public,max-age=31536000",
+                "static files.match": "\.(css|js|woff|woff2)$",
+            })
             return config
         lektor_s3.S3Publisher.get_config = monkeypatched_get_config
 

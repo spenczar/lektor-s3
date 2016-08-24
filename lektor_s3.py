@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import ConfigParser
 import mimetypes
 import os
 import posixpath
@@ -12,6 +11,7 @@ from lektor.pluginsystem import Plugin
 
 import boto3
 import botocore.exceptions
+import inifile
 from s3transfer.manager import TransferManager
 
 
@@ -43,9 +43,7 @@ class S3Publisher(Publisher):
         return os.path.join(self.env.root_path, 'configs', 's3.ini')
 
     def get_config(self):
-        config = ConfigParser.ConfigParser()
-        config.read(self.config_filename)
-        return config
+        return inifile.IniFile(self.config_filename)
 
     def split_bucket_uri(self, target_url):
         bucket = target_url.netloc
@@ -163,26 +161,25 @@ class S3Publisher(Publisher):
         headers = {'ContentType': mime}
 
         # Set defaults first
+        defaults = self.config.section_as_dict("DEFAULTS")
         for upload_arg in TransferManager.ALLOWED_UPLOAD_ARGS:
-            upload_arg_value = self.config.defaults().get(upload_arg.lower())
+            upload_arg_value = defaults.get(upload_arg)
             if upload_arg_value:
                 headers.update({upload_arg: upload_arg_value})
 
         # Set file-specific rules
         config_sections = self.config.sections()
         for section in config_sections:
-            items = self.config.items(section)
-            options = dict((x, y) for x, y in items)
+            section_kvs = self.config.section_as_dict(section)
             section_applies = False
 
-            if 'match' in options:
-                match = self.config.get(section, 'match')
-                if re.search(match, filename):
+            if 'match' in section_kvs:
+                if re.search(section_kvs['match'], filename):
                     section_applies = True
 
-            if not section_applies and 'extensions' in options:
+            if not section_applies and 'extensions' in section_kvs:
                 ext = os.path.splitext(filename)[1][1:]
-                extensions = self.config.get(section, 'extensions')
+                extensions = section_kvs['extensions']
                 if ext in extensions.split(','):
                     section_applies = True
 
@@ -190,9 +187,8 @@ class S3Publisher(Publisher):
                 continue
 
             for upload_arg in TransferManager.ALLOWED_UPLOAD_ARGS:
-                if self.config.has_option(section, upload_arg):
-                    upload_arg_value = self.config.get(section, upload_arg)
-                    headers.update({upload_arg: upload_arg_value})
+                if upload_arg in section_kvs:
+                    headers.update({upload_arg: section_kvs[upload_arg]})
 
         return headers
 
