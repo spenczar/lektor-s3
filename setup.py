@@ -19,10 +19,12 @@ setup(
     tests_require=[
         'nose',
         'boto3>=1.1.4',
+        's3transfer',
     ],
     install_requires=[
         'Lektor',
         'boto3>=1.1.4',
+        's3transfer',
     ],
     classifiers=[
         'Development Status :: 4 - Beta',

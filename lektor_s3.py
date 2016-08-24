@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+import ConfigParser
 import mimetypes
 import os
 import posixpath
+import re
 import time
 from hashlib import md5
 
@@ -10,6 +12,7 @@ from lektor.pluginsystem import Plugin
 
 import boto3
 import botocore.exceptions
+from s3transfer.manager import TransferManager
 
 
 class S3Plugin(Plugin):
@@ -33,6 +36,16 @@ class S3Publisher(Publisher):
         self.bucket = None
         self.key_prefix = ''
         self.cloudfront = None
+        self.config = self.get_config()
+
+    @property
+    def config_filename(self):
+        return os.path.join(self.env.root_path, 'configs', 's3.ini')
+
+    def get_config(self):
+        config = ConfigParser.ConfigParser()
+        config.read(self.config_filename)
+        return config
 
     def split_bucket_uri(self, target_url):
         bucket = target_url.netloc
@@ -142,14 +155,53 @@ class S3Publisher(Publisher):
                 diff['delete'].append(k)
         return diff
 
-    def add(self, filename):
-        abs_filename = os.path.join(self.output_path, filename)
-        key = self.key_prefix + filename
-
+    def create_headers(self, filename):
+        """ Set file headers from mimetype and config. """
         mime, _ = mimetypes.guess_type(filename)
         if mime is None:
             mime = "text/plain"
-        self.bucket.upload_file(abs_filename, posixify(key), ExtraArgs={'ContentType': mime})
+        headers = {'ContentType': mime}
+
+        # Set defaults first
+        for upload_arg in TransferManager.ALLOWED_UPLOAD_ARGS:
+            upload_arg_value = self.config.defaults().get(upload_arg.lower())
+            if upload_arg_value:
+                headers.update({upload_arg: upload_arg_value})
+
+        # Set file-specific rules
+        config_sections = self.config.sections()
+        for section in config_sections:
+            items = self.config.items(section)
+            options = dict((x, y) for x, y in items)
+            section_applies = False
+
+            if 'match' in options:
+                match = self.config.get(section, 'match')
+                if re.search(match, filename):
+                    section_applies = True
+
+            if not section_applies and 'extensions' in options:
+                ext = os.path.splitext(filename)[1][1:]
+                extensions = self.config.get(section, 'extensions')
+                if ext in extensions.split(','):
+                    section_applies = True
+
+            if not section_applies:
+                continue
+
+            for upload_arg in TransferManager.ALLOWED_UPLOAD_ARGS:
+                if self.config.has_option(section, upload_arg):
+                    upload_arg_value = self.config.get(section, upload_arg)
+                    headers.update({upload_arg: upload_arg_value})
+
+        return headers
+
+    def add(self, filename):
+        abs_filename = os.path.join(self.output_path, filename)
+        key = self.key_prefix + filename
+        headers = self.create_headers(filename)
+
+        self.bucket.upload_file(abs_filename, posixify(key), ExtraArgs=headers)
 
     def update(self, filename):
         # Updates are just overwrites in S3
