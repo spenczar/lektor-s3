@@ -1,5 +1,7 @@
 # lektor-s3 #
 
+[![Build Status](https://travis-ci.org/spenczar/lektor-s3.svg?branch=master)](https://travis-ci.org/spenczar/lektor-s3)
+
 lektor-s3 makes it easy to deploy your
 [Lektor](https://github.com/lektor/lektor) project to an S3 bucket.
 
