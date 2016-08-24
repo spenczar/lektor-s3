@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.4.0] - 2016-08-24
+- Added a new system for configuration: an INI file can be stored in
+  `config/s3.ini` of the project root. This system can be used to set
+  headers for uploaded files.
+
 ## [0.3.2] - 2016-08-23
 - Fix bug in the posixification code which crashed on empty paths
 
