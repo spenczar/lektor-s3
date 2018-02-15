@@ -25,7 +25,7 @@ def TemporaryDirectory():
 class TestLoadConfig(TestCase):
     def test_no_config_file(self):
         publisher = lektor_s3.S3Publisher(MockEnvironment(""), "")
-        self.assertEqual(len(publisher.get_config().sections()), 0)
+        self.assertEqual(len(list(publisher.get_config().sections())), 0)
 
     def test_load_config_file(self):
         with TemporaryDirectory() as tempdir:
