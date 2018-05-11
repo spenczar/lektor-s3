@@ -1,9 +1,14 @@
 from setuptools import setup
 
+with open('README.md', 'rt', encoding='utf8') as readme_file:
+    readme = readme_file.read()
+
 setup(
     name='lektor-s3',
     description='Lektor plugin to support publishing to S3',
-    version='0.4.0',
+    long_description=readme,
+    long_description_content_type='text/markdown',
+    version='0.5.0',
     author='Spencer Nelson',
     author_email='s@spenczar.com',
     url='https://github.com/spenczar/lektor-s3',
@@ -29,7 +34,9 @@ setup(
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
+        'Environment :: Plugins',
         'Environment :: Web Environment',
+        'Framework :: Lektor',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
