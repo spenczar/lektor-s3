@@ -8,7 +8,7 @@ setup(
     description='Lektor plugin to support publishing to S3',
     long_description=readme,
     long_description_content_type='text/markdown',
-    version='0.5.0',
+    version='0.5.1',
     author='Spencer Nelson',
     author_email='s@spenczar.com',
     url='https://github.com/spenczar/lektor-s3',
